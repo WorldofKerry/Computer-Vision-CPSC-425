@@ -2,6 +2,7 @@ from matplotlib import pyplot as plt
 from PIL import Image, ImageDraw
 import numpy as np
 import pickle
+import sys
 
 '''
 The MIT License (MIT)
@@ -86,8 +87,8 @@ def handle_close(event):
 
 # === Script execution starts here ===
 # imname is the name of the image file that you want to read.
-imname = 'donkey.jpg'
-
+imname = sys.argv[1]
+2016
 # === Read the image
 im = Image.open( imname ).convert('RGB')
 im_array = np.asarray( im, dtype=np.uint8 )
@@ -97,7 +98,7 @@ print('Would you like to select the region to be filled (0) or the sample textur
 
 Zero_or_One = False
 while not Zero_or_One:
-    answer = raw_input("0 or 1: ")
+    answer = input("0 or 1: ")
     if answer == "0" or answer == "1":
             Zero_or_One = True
 
