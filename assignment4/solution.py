@@ -62,11 +62,6 @@ def FindBestMatches(descriptors1, descriptors2, threshold):
     # matched_pairs = [[i, i] for i in range(num)]
     # ## END
     matched_pairs = []
-    # for i in range(len(descriptors1)): 
-    #     descriptors2_sorted = sorted(descriptors2, key=lambda d2: math.acos(np.dot(descriptors1[i], d2)))
-    #     if math.acos(np.dot(descriptors1[i], descriptors2_sorted[0])) / math.acos(np.dot(descriptors1[i], descriptors2_sorted[1])) <= threshold:
-    #         print(descriptors2 == descriptors2_sorted[0])
-    #         # matched_pairs.append([i, np.where(descriptors2 == descriptors2_sorted[0])])
     for i in range(len(descriptors1)):
         descriptors2_sorted = sorted(enumerate(descriptors2), key=lambda d2: math.acos(np.dot(descriptors1[i], d2[1])))
         if math.acos(np.dot(descriptors1[i], descriptors2_sorted[0][1])) / math.acos(np.dot(descriptors1[i], descriptors2_sorted[1][1])) <= threshold:
