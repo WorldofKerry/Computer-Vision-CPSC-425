@@ -30,8 +30,18 @@ def RANSACFilter(
     assert isinstance(orient_agreement, float)
     assert isinstance(scale_agreement, float)
     ## START
-
-
+    random_selections = random.sample(matched_pairs, 10)
+    largest_set = []
+    # keypoint = (row, col, scale, orientation)
+    for i in range(len(random_selections)):
+        base_orientation = keypoints1[random_selections[i][0]][3] - keypoints2[random_selections[i][1]][3]
+        base_scale = keypoints1[random_selections[i][0]][2]/keypoints2[random_selections[i][1]][2]
+        current_set = []
+        for j in range(len(matched_pairs)):
+            if abs(keypoints1[matched_pairs[j][0]][3] - keypoints2[matched_pairs[j][1]][3] - base_orientation) <= orient_agreement and abs(keypoints1[matched_pairs[j][0]][2]/keypoints2[matched_pairs[j][1]][2] - base_scale) <= scale_agreement:
+                current_set.append(matched_pairs[j])
+        if len(current_set) > len(largest_set):
+            largest_set = current_set
     ## END
     assert isinstance(largest_set, list)
     return largest_set
@@ -86,7 +96,10 @@ def KeypointProjection(xy_points, h):
     assert h.shape == (3, 3)
 
     # START
-
+    homogeneous_points = np.ones((xy_points.shape[0], 3))
+    homogeneous_points[:, :2] = xy_points
+    xy_points_out = np.dot(h, homogeneous_points.T).T
+    xy_points_out = xy_points_out[:, :2] / xy_points_out[:, 2:]    
     # END
     return xy_points_out
 
@@ -118,10 +131,20 @@ def RANSACHomography(xy_src, xy_ref, num_iter, tol):
     tol = tol*1.0
 
     # START
-
-
-
+    largest_set = []
+    for i in range(num_iter):
+        random_selections = random.sample(range(len(xy_src)), 4)
+        h = cv2.findHomography(xy_src[random_selections], xy_ref[random_selections])[0]
+        projected_points = KeypointProjection(xy_src, h)
+        current_set = []
+        for j in range(len(xy_src)):
+            if np.linalg.norm(xy_ref[j] - projected_points[j]) <= tol:
+                current_set.append(j)
+        if len(current_set) > len(largest_set):
+            largest_set = current_set
+    h = cv2.findHomography(xy_src[largest_set], xy_ref[largest_set])[0]    
     # END
+    
     assert isinstance(h, np.ndarray)
     assert h.shape == (3, 3)
     return h
